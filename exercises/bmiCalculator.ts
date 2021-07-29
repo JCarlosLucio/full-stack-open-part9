@@ -1,4 +1,4 @@
-type Result =
+type BmiResult =
   | 'Invalid bmi value'
   | 'Underweight (severe thinness)'
   | 'Underweight (moderate thinness)'
@@ -9,7 +9,7 @@ type Result =
   | 'Obese (class II)'
   | 'Obese (class III)';
 
-const calculateBmi = (height: number, weight: number): Result => {
+const calculateBmi = (height: number, weight: number): BmiResult => {
   const bmi = weight / (height / 100) ** 2;
 
   switch (true) {
