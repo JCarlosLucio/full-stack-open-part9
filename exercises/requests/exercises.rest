@@ -1,0 +1,32 @@
+POST http://localhost:3002/exercises
+Content-Type: application/json
+
+{
+  "target": 2,
+  "daily_exercises": [3, 0, 2, 4.5, 0, 3, 1]
+}
+
+###
+POST http://localhost:3002/exercises
+Content-Type: application/json
+
+{
+  "target": 2,
+  "daily_exercises": ["lol", "lol"]
+}
+
+###
+POST http://localhost:3002/exercises
+Content-Type: application/json
+
+{
+  "target": "lol",
+  "daily_exercises": [3, 1]
+}
+
+###
+POST http://localhost:3002/exercises
+Content-Type: application/json
+
+{
+}
