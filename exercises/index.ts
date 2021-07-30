@@ -25,7 +25,9 @@ app.get('/bmi', (req, res) => {
 
     res.json(bmiResult);
   } catch (e) {
-    res.status(400).json({ error: e.message });
+    if (e instanceof Error) {
+      res.status(400).json({ error: e.message });
+    }
   }
 });
 
