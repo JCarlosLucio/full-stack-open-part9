@@ -8,3 +8,34 @@ Content-Type: application/json
   "gender": "male",
   "occupation": "hero"
 }
+
+###
+POST http://localhost:3001/api/patients
+Content-Type: application/json
+
+{
+  "name": "Link",
+  "dateOfBirth":"not a date",
+  "ssn": "090786-420X",
+  "gender": "male",
+  "occupation": "hero"
+}
+
+###
+POST http://localhost:3001/api/patients
+Content-Type: application/json
+
+{
+  "name": "Link",
+  "dateOfBirth":"2021-01-01",
+  "ssn": "090786-420X",
+  "gender": "123456",
+  "occupation": "hero"
+}
+
+###
+POST http://localhost:3001/api/patients
+Content-Type: application/json
+
+{
+}
