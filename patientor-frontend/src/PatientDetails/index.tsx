@@ -6,13 +6,14 @@ import { Header, Icon, List } from 'semantic-ui-react';
 import { apiBaseUrl } from '../constants';
 import { updatePatient, useStateValue } from '../state';
 import { Gender, GenderIcon, Patient } from '../types';
+import EntryDetails from './EntryDetails';
 
 const PatientDetails = () => {
   const [{ patients }, dispatch] = useStateValue();
   const { id } = useParams<{ id: string }>();
 
   const patient = patients[id];
-
+  console.log(patient);
   useEffect(() => {
     const fetchPatient = async () => {
       try {
@@ -25,7 +26,7 @@ const PatientDetails = () => {
       }
     };
 
-    if (!patient || !patient?.ssn) {
+    if (!patient || !patient?.ssn || !patient?.entries) {
       void fetchPatient();
     }
   }, []);
@@ -53,9 +54,21 @@ const PatientDetails = () => {
           <Icon name={getGenderIcon(patient.gender)} />
         </Header.Content>
       </Header>
+
       <List size="large">
         <List.Item>ssn: {patient.ssn}</List.Item>
         <List.Item>occupation: {patient.occupation}</List.Item>
+      </List>
+
+      <Header size="medium">entries</Header>
+      <List size="large">
+        {patient.entries && patient.entries.length > 0 ? (
+          patient.entries.map((entry) => (
+            <EntryDetails key={entry.id} entry={entry} />
+          ))
+        ) : (
+          <List.Item>No entries</List.Item>
+        )}
       </List>
     </div>
   );
