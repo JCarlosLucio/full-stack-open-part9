@@ -1,18 +1,26 @@
 import React from 'react';
-import { List } from 'semantic-ui-react';
 import { Entry } from '../types';
-import Codes from './Codes';
+import HealthCheckDetails from './HealthCheckDetails';
+import HospitalDetails from './HospitalDetails';
+import OccupationalHealthcareDetails from './OccupationalHealthcareDetails';
 
 const EntryDetails = ({ entry }: { entry: Entry }) => {
-  return (
-    <List.Item>
-      {entry.date}
-      <em> {entry.description}</em>
-      {entry.diagnosisCodes && entry.diagnosisCodes.length > 0 && (
-        <Codes codes={entry.diagnosisCodes} />
-      )}
-    </List.Item>
-  );
+  const assertNever = (value: never): never => {
+    throw new Error(
+      `Unhandled discriminated union member: ${JSON.stringify(value)}`
+    );
+  };
+
+  switch (entry.type) {
+    case 'Hospital':
+      return <HospitalDetails entry={entry} />;
+    case 'OccupationalHealthcare':
+      return <OccupationalHealthcareDetails entry={entry} />;
+    case 'HealthCheck':
+      return <HealthCheckDetails entry={entry} />;
+    default:
+      return assertNever(entry);
+  }
 };
 
 export default EntryDetails;
