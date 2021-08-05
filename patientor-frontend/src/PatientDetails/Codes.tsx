@@ -9,7 +9,7 @@ const Codes = ({ codes }: { codes: Array<Diagnosis['code']> }) => {
     <List bulleted>
       {codes.map((code) => (
         <List.Item key={code}>
-          {code} {diagnoses[code].name}
+          {code} {diagnoses[code]?.name}
         </List.Item>
       ))}
     </List>

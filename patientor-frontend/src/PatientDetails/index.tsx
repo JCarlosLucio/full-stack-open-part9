@@ -1,19 +1,24 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { Header, Icon, List } from 'semantic-ui-react';
+import { Button, Header, Icon, List } from 'semantic-ui-react';
 
 import { apiBaseUrl } from '../constants';
-import { updatePatient, useStateValue } from '../state';
-import { Gender, GenderIcon, Patient } from '../types';
+import { addEntry, updatePatient, useStateValue } from '../state';
+import { Entry, Gender, GenderIcon, Patient } from '../types';
 import EntryDetails from './EntryDetails';
+import AddEntryModal from '../AddEntryModal';
+import { EntryFormValues } from '../AddEntryModal/AddEntryForm';
 
 const PatientDetails = () => {
   const [{ patients }, dispatch] = useStateValue();
   const { id } = useParams<{ id: string }>();
 
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [error, setError] = useState<string | undefined>();
+
   const patient = patients[id];
-  console.log(patient);
+
   useEffect(() => {
     const fetchPatient = async () => {
       try {
@@ -30,6 +35,28 @@ const PatientDetails = () => {
       void fetchPatient();
     }
   }, []);
+
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
+
+  const submitNewEntry = async (values: EntryFormValues) => {
+    try {
+      console.log('new entry values', values);
+      const { data: newEntry } = await axios.post<Entry>(
+        `${apiBaseUrl}/patients/${id}/entries`,
+        values
+      );
+      dispatch(addEntry(id, newEntry));
+      closeModal();
+    } catch (e) {
+      console.error(e.response?.data || 'Unknown Error');
+      setError(e.response?.data?.error || 'Unknown error');
+    }
+  };
 
   const getGenderIcon = (gender: Gender): GenderIcon => {
     switch (gender) {
@@ -54,13 +81,20 @@ const PatientDetails = () => {
           <Icon name={getGenderIcon(patient.gender)} />
         </Header.Content>
       </Header>
-
       <List size="large">
         <List.Item>ssn: {patient.ssn}</List.Item>
         <List.Item>occupation: {patient.occupation}</List.Item>
       </List>
 
       <Header size="medium">entries</Header>
+      <AddEntryModal
+        modalOpen={modalOpen}
+        onSubmit={submitNewEntry}
+        error={error}
+        onClose={closeModal}
+      />
+      <Button onClick={() => openModal()}>Add New Entry</Button>
+
       <List size="large">
         {patient.entries && patient.entries.length > 0 ? (
           patient.entries.map((entry) => (
