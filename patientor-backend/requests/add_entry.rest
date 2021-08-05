@@ -1,0 +1,43 @@
+POST http://localhost:3001/api/patients/d2773336-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+  "date": "2021-06-01",
+  "specialist": "Dr Oak",
+  "type": "HealthCheck",
+  "description": "Fatigue, due to extreme walking. But healthy.",
+  "healthCheckRating": 0
+}
+
+###
+POST http://localhost:3001/api/patients/d2773336-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+  "date": "2021-01-01",
+  "specialist": "Dr Oak",
+  "type": "Hospital",
+  "description": "Electroshock burns in 60% of body.",
+  "diagnosisCodes": ["Z74.3"],
+  "discharge": {
+    "date": "2021-06-01",
+    "criteria": "Burn skin has healed completely."
+  }
+}
+
+###
+POST http://localhost:3001/api/patients/d2773336-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+  "date": "2020-12-31",
+  "specialist": "Dr Dorian",
+  "type": "OccupationalHealthcare",
+  "description": "Expose to radiation inside secret laboratory.",
+  "diagnosisCodes": ["Z57.1"],
+  "employerName": "Umbrella Corp",
+  "sickLeave": {
+    "startDate": "2021-01-01",
+    "endDate": "2021-03-01"
+  }
+}
