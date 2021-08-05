@@ -5,6 +5,7 @@ import { Button, Grid } from 'semantic-ui-react';
 import { DiagnosisSelection, NumberField, TextField } from './FormField';
 import { useStateValue } from '../state';
 import { HealthCheckEntry, HealthCheckRating } from '../types';
+import { isValidDate } from '../utils';
 
 export type EntryFormValues = Omit<HealthCheckEntry, 'id'>;
 
@@ -29,6 +30,8 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
       onSubmit={onSubmit}
       validate={(values) => {
         const requiredError = 'Field is required';
+        const invalidDateError = 'Invalid date format. Must match YYYY-MM-DD';
+        const minMaxError = 'Value must be between 0 - 3';
         const errors: { [field: string]: string } = {};
         if (!values.date) {
           errors.date = requiredError;
@@ -38,6 +41,16 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
         }
         if (!values.specialist) {
           errors.specialist = requiredError;
+        }
+        if (!values.healthCheckRating && values.healthCheckRating !== 0) {
+          errors.healthCheckRating = requiredError;
+        }
+
+        if (values.date && !isValidDate(values.date)) {
+          errors.date = invalidDateError;
+        }
+        if (!(values.healthCheckRating >= 0 && 3 >= values.healthCheckRating)) {
+          errors.healthCheckRating = minMaxError;
         }
         return errors;
       }}

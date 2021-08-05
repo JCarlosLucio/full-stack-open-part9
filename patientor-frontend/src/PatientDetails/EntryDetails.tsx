@@ -3,14 +3,9 @@ import { Entry } from '../types';
 import HealthCheckDetails from './HealthCheckDetails';
 import HospitalDetails from './HospitalDetails';
 import OccupationalHealthcareDetails from './OccupationalHealthcareDetails';
+import { assertNever } from '../utils';
 
 const EntryDetails = ({ entry }: { entry: Entry }) => {
-  const assertNever = (value: never): never => {
-    throw new Error(
-      `Unhandled discriminated union member: ${JSON.stringify(value)}`
-    );
-  };
-
   switch (entry.type) {
     case 'Hospital':
       return <HospitalDetails entry={entry} />;

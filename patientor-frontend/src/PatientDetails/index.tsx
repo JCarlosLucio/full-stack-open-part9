@@ -3,12 +3,13 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { Button, Header, Icon, List } from 'semantic-ui-react';
 
-import { apiBaseUrl } from '../constants';
-import { addEntry, updatePatient, useStateValue } from '../state';
-import { Entry, Gender, GenderIcon, Patient } from '../types';
-import EntryDetails from './EntryDetails';
 import AddEntryModal from '../AddEntryModal';
 import { EntryFormValues } from '../AddEntryModal/AddEntryForm';
+import EntryDetails from './EntryDetails';
+import { apiBaseUrl } from '../constants';
+import { addEntry, updatePatient, useStateValue } from '../state';
+import { Entry, Patient } from '../types';
+import { getGenderIcon } from '../utils';
 
 const PatientDetails = () => {
   const [{ patients }, dispatch] = useStateValue();
@@ -55,17 +56,6 @@ const PatientDetails = () => {
     } catch (e) {
       console.error(e.response?.data || 'Unknown Error');
       setError(e.response?.data?.error || 'Unknown error');
-    }
-  };
-
-  const getGenderIcon = (gender: Gender): GenderIcon => {
-    switch (gender) {
-      case Gender.Male:
-        return GenderIcon.Male;
-      case Gender.Female:
-        return GenderIcon.Female;
-      default:
-        return GenderIcon.Other;
     }
   };
 
