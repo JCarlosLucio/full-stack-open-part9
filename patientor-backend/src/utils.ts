@@ -240,7 +240,9 @@ export const toNewEntry = (object: any): NewEntry => {
         ...newBaseEntry,
         type,
         employerName: parseEmployerName(object.employerName),
-        sickLeave: parseSickLeave(object.sickLeave),
+        ...(isSickLeave(object.sickLeave) && {
+          sickLeave: parseSickLeave(object.sickLeave),
+        }),
       };
 
     default:

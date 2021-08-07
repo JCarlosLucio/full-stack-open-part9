@@ -1,6 +1,6 @@
 import React from 'react';
 import { Field, Form, Formik } from 'formik';
-import { Button, Grid } from 'semantic-ui-react';
+import { Button, Divider, FormGroup, Grid, Header } from 'semantic-ui-react';
 
 import {
   DiagnosisSelection,
@@ -15,12 +15,14 @@ import {
   HealthCheckRating,
   HealthCheckEntry,
   HospitalEntry,
+  OccupationalHealthcareEntry,
 } from '../types';
-import { isObject, isValidDate } from '../utils';
+import { isObject, isToLaterThanFrom, isValidDate } from '../utils';
 
 export interface EntryFormValues
   extends Omit<HealthCheckEntry, 'id' | 'type'>,
-    Omit<HospitalEntry, 'id' | 'type'> {
+    Omit<HospitalEntry, 'id' | 'type'>,
+    Omit<OccupationalHealthcareEntry, 'id' | 'type'> {
   type: EntryType;
 }
 
@@ -32,6 +34,7 @@ interface Props {
 const entryTypeOptions: EntryTypeOption[] = [
   { value: EntryType.HealthCheck, label: 'Health Check' },
   { value: EntryType.Hospital, label: 'Hospital' },
+  { value: EntryType.OccupationalHealthcare, label: 'Occupational Healthcare' },
 ];
 
 // initial values for Formik
@@ -39,7 +42,7 @@ const initialBaseValues = {
   date: '',
   description: '',
   specialist: '',
-  diagnosisCodes: [],
+  diagnosisCodes: undefined,
 };
 
 const initialHealthCheckValues = {
@@ -53,6 +56,14 @@ const initialHospitalValues = {
   },
 };
 
+const initialOccupationalHealthcareValues = {
+  employerName: '',
+  sickLeave: {
+    startDate: '',
+    endDate: '',
+  },
+};
+
 const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
   const [{ diagnoses }] = useStateValue();
 
@@ -63,12 +74,15 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
         ...initialBaseValues,
         ...initialHealthCheckValues,
         ...initialHospitalValues,
+        ...initialOccupationalHealthcareValues,
       }}
       onSubmit={onSubmit}
       validate={(values) => {
         const requiredError = 'Field is required';
         const invalidDateError = 'Invalid date format. Must match YYYY-MM-DD';
         const minMaxError = 'Value must be between 0 - 3';
+        const startDateError = '"From" date must be before "To" date';
+        const endDateError = '"To" date must be after "From" date';
         const errors: {
           [field: string]: string | { [field: string]: string };
         } = {};
@@ -115,6 +129,58 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
           }
         }
 
+        // Validations for Occupational Healthcare Entry
+        if (values.type === EntryType.OccupationalHealthcare) {
+          if (!values.employerName) {
+            errors.employerName = requiredError;
+          }
+          if (values.sickLeave.startDate && !values.sickLeave.endDate) {
+            errors.sickLeave = isObject(errors.sickLeave)
+              ? { ...errors.sickLeave, endDate: requiredError }
+              : { endDate: requiredError };
+          }
+          if (values.sickLeave.endDate && !values.sickLeave.startDate) {
+            errors.sickLeave = isObject(errors.sickLeave)
+              ? { ...errors.sickLeave, startDate: requiredError }
+              : { startDate: requiredError };
+          }
+          if (
+            values.sickLeave.startDate &&
+            !isValidDate(values.sickLeave.startDate)
+          ) {
+            errors.sickLeave = isObject(errors.sickLeave)
+              ? { ...errors.sickLeave, startDate: invalidDateError }
+              : { startDate: invalidDateError };
+          }
+
+          if (
+            values.sickLeave.endDate &&
+            !isValidDate(values.sickLeave.endDate)
+          ) {
+            errors.sickLeave = isObject(errors.sickLeave)
+              ? { ...errors.sickLeave, endDate: invalidDateError }
+              : { endDate: invalidDateError };
+          }
+          if (
+            values.sickLeave.startDate &&
+            isValidDate(values.sickLeave.startDate) &&
+            values.sickLeave.endDate &&
+            isValidDate(values.sickLeave.endDate) &&
+            !isToLaterThanFrom(
+              values.sickLeave.startDate,
+              values.sickLeave.endDate
+            )
+          ) {
+            errors.sickLeave = isObject(errors.sickLeave)
+              ? {
+                  ...errors.sickLeave,
+                  startDate: startDateError,
+                  endDate: endDateError,
+                }
+              : { startDate: startDateError, endDate: endDateError };
+          }
+        }
+
         return errors;
       }}
     >
@@ -153,13 +219,18 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
             {
               /** Healthcheck Entry */
               values.type === EntryType.HealthCheck && (
-                <Field
-                  label="Health Check Rating"
-                  name="healthCheckRating"
-                  min={HealthCheckRating.Healthy}
-                  max={HealthCheckRating.CriticalRisk}
-                  component={NumberField}
-                />
+                <React.Fragment>
+                  <Divider horizontal>
+                    <label>Health Check</label>
+                  </Divider>
+                  <Field
+                    label="Health Check Rating"
+                    name="healthCheckRating"
+                    min={HealthCheckRating.Healthy}
+                    max={HealthCheckRating.CriticalRisk}
+                    component={NumberField}
+                  />
+                </React.Fragment>
               )
             }
 
@@ -167,6 +238,9 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
               /** Hospital Entry */
               values.type === EntryType.Hospital && (
                 <React.Fragment>
+                  <Divider horizontal>
+                    <label>Hospital</label>
+                  </Divider>
                   <Field
                     label="Date of Discharge"
                     placeholder="YYYY-MM-DD"
@@ -179,6 +253,40 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
                     name="discharge.criteria"
                     component={TextField}
                   />
+                </React.Fragment>
+              )
+            }
+
+            {
+              /** Occupational Healthcare Entry */
+              values.type === EntryType.OccupationalHealthcare && (
+                <React.Fragment>
+                  <Divider horizontal>
+                    <label>Occupational Healthcare</label>
+                  </Divider>
+                  <Field
+                    label="Employer Name"
+                    placeholder="Employer Name"
+                    name="employerName"
+                    component={TextField}
+                  />
+                  <Divider horizontal>
+                    <Header size="tiny">Sick Leave (Optional)</Header>
+                  </Divider>
+                  <FormGroup widths="equal">
+                    <Field
+                      label="From"
+                      placeholder="YYYY-MM-DD"
+                      name="sickLeave.startDate"
+                      component={TextField}
+                    />
+                    <Field
+                      label="To"
+                      placeholder="YYYY-MM-DD"
+                      name="sickLeave.endDate"
+                      component={TextField}
+                    />
+                  </FormGroup>
                 </React.Fragment>
               )
             }

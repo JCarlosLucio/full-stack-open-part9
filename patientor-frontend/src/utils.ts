@@ -26,3 +26,7 @@ export const getGenderIcon = (gender: Gender): GenderIcon => {
 export const isObject = (obj: unknown): obj is Record<string, unknown> => {
   return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
 };
+
+export const isToLaterThanFrom = (from: string, to: string): boolean => {
+  return new Date(from) <= new Date(to);
+};

@@ -93,7 +93,7 @@ export const DiagnosisSelection = ({
 
   return (
     <Form.Field>
-      <label>Diagnoses</label>
+      <label>Diagnoses (Optional)</label>
       <Dropdown
         fluid
         multiple
