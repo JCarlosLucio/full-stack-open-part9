@@ -21,3 +21,8 @@ export const getGenderIcon = (gender: Gender): GenderIcon => {
       return GenderIcon.Other;
   }
 };
+
+// not using 'obj is object' because the object type is currently hard to use due to not being able to assert that keys exist
+export const isObject = (obj: unknown): obj is Record<string, unknown> => {
+  return typeof obj === 'object' && obj !== null && !Array.isArray(obj);
+};

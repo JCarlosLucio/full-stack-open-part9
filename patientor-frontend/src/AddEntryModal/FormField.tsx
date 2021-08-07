@@ -1,7 +1,7 @@
 import React from 'react';
 import { ErrorMessage, Field, FieldProps, FormikProps } from 'formik';
 import { Dropdown, DropdownProps, Form } from 'semantic-ui-react';
-import { Diagnosis } from '../types';
+import { Diagnosis, EntryType } from '../types';
 
 interface TextProps extends FieldProps {
   label: string;
@@ -17,6 +17,34 @@ export const TextField = ({ field, label, placeholder }: TextProps) => (
     </div>
   </Form.Field>
 );
+
+// structure of a single option
+export type EntryTypeOption = {
+  value: EntryType;
+  label: string;
+};
+
+// props for select field component
+type SelectFieldProps = {
+  name: string;
+  label: string;
+  options: EntryTypeOption[];
+};
+
+export const SelectField = ({ name, label, options }: SelectFieldProps) => {
+  return (
+    <Form.Field>
+      <label>{label}</label>
+      <Field as="select" name={name} className="ui dropdown">
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label || option.value}
+          </option>
+        ))}
+      </Field>
+    </Form.Field>
+  );
+};
 
 /*
   for exercises 9.24.-
