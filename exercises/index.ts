@@ -29,13 +29,11 @@ app.get('/bmi', (req, res) => {
   return res.json(bmiResult);
 });
 
-interface ExercisesReqBody {
-  target: number;
-  daily_exercises: Array<number>;
-}
-
 app.post('/exercises', (req, res) => {
-  const { target, daily_exercises: hours } = req.body as ExercisesReqBody;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const body: any = req.body;
+  const target: number = body.target;
+  const hours: number[] = body.daily_exercises;
 
   if (!target || !hours) {
     return res.status(400).json({ error: 'parameters missing' });
